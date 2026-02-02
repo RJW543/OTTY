@@ -54,6 +54,16 @@ if ! id "$KIOSK_USER" &>/dev/null; then
     echo "$KIOSK_USER:test123" | chpasswd
 fi
 
+# --- Grant hardware RNG access (Pi 5) ---
+if [ -e /dev/hwrng ]; then
+    echo_status "Granting hardware RNG access..."
+    # Add user to the group that owns /dev/hwrng
+    HWRNG_GROUP=$(stat -c '%G' /dev/hwrng)
+    usermod -aG "$HWRNG_GROUP" "$KIOSK_USER"
+    # Also ensure permissions are correct
+    chmod 660 /dev/hwrng
+fi
+
 # --- Setup App Directory ---
 echo_status "Setting up application..."
 mkdir -p "$APP_DIR"
