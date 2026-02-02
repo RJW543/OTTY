@@ -8,6 +8,7 @@
 # - Sets up the launcher
 # - Does NOT disable escape methods (for testing)
 # - Easy to reverse
+# - Handles files with or without .py extension
 #
 # Usage: sudo ./setup_kiosk_vm_test.sh
 #
@@ -57,14 +58,46 @@ fi
 echo_status "Setting up application..."
 mkdir -p "$APP_DIR"
 
-# Copy Python files from parent directory or current directory
-for file in otp_client.py otp_relay_server.py otp_generator.py otp_cipher.txt; do
-    if [ -f "$SCRIPT_DIR/$file" ]; then
-        cp "$SCRIPT_DIR/$file" "$APP_DIR/"
-    elif [ -f "$SCRIPT_DIR/../$file" ]; then
-        cp "$SCRIPT_DIR/../$file" "$APP_DIR/"
+# Function to copy file (handles with or without .py extension)
+copy_py_file() {
+    local basename="$1"
+    local dest="$APP_DIR/${basename}.py"
+    
+    # Try with .py extension first
+    if [ -f "$SCRIPT_DIR/${basename}.py" ]; then
+        cp "$SCRIPT_DIR/${basename}.py" "$dest"
+        echo_status "Copied ${basename}.py"
+    # Try without .py extension
+    elif [ -f "$SCRIPT_DIR/${basename}" ]; then
+        cp "$SCRIPT_DIR/${basename}" "$dest"
+        echo_status "Copied ${basename} -> ${basename}.py"
+    # Try parent directory with .py
+    elif [ -f "$SCRIPT_DIR/../${basename}.py" ]; then
+        cp "$SCRIPT_DIR/../${basename}.py" "$dest"
+        echo_status "Copied ${basename}.py from parent"
+    # Try parent directory without .py
+    elif [ -f "$SCRIPT_DIR/../${basename}" ]; then
+        cp "$SCRIPT_DIR/../${basename}" "$dest"
+        echo_status "Copied ${basename} -> ${basename}.py from parent"
+    else
+        echo_warn "${basename} not found"
     fi
-done
+}
+
+# Copy all Python files
+copy_py_file "otp_client"
+copy_py_file "otp_relay_server"
+copy_py_file "otp_generator"
+copy_py_file "get_username"
+
+# Copy otp_cipher.txt if it exists
+if [ -f "$SCRIPT_DIR/otp_cipher.txt" ]; then
+    cp "$SCRIPT_DIR/otp_cipher.txt" "$APP_DIR/"
+    echo_status "Copied otp_cipher.txt"
+elif [ -f "$SCRIPT_DIR/../otp_cipher.txt" ]; then
+    cp "$SCRIPT_DIR/../otp_cipher.txt" "$APP_DIR/"
+    echo_status "Copied otp_cipher.txt from parent"
+fi
 
 # --- Create Test Launcher (with escape ability) ---
 cat > "$APP_DIR/kiosk_launcher.py" << 'LAUNCHER_EOF'
@@ -201,22 +234,34 @@ class KioskLauncher:
         else:
             self.status.config(text="⚠️ No OTP file found - run Generator first", fg='#e94560')
     
-    def launch_app(self, filename):
-        path = os.path.join(self.app_dir, filename)
-        if os.path.exists(path):
+    def find_file(self, basename):
+        """Find file with or without .py extension"""
+        # Try with .py first
+        path_py = os.path.join(self.app_dir, f"{basename}.py")
+        if os.path.exists(path_py):
+            return path_py
+        # Try without .py
+        path_no_ext = os.path.join(self.app_dir, basename)
+        if os.path.exists(path_no_ext):
+            return path_no_ext
+        return None
+    
+    def launch_app(self, basename):
+        path = self.find_file(basename)
+        if path:
             subprocess.Popen([sys.executable, path], cwd=self.app_dir)
             self.master.after(1000, self.update_otp_status)
         else:
-            messagebox.showerror("Error", f"{filename} not found!")
+            messagebox.showerror("Error", f"{basename} not found!")
     
     def launch_client(self):
-        self.launch_app("otp_client.py")
+        self.launch_app("otp_client")
     
     def launch_server(self):
-        self.launch_app("otp_relay_server.py")
+        self.launch_app("otp_relay_server")
     
     def launch_generator(self):
-        self.launch_app("otp_generator.py")
+        self.launch_app("otp_generator")
 
 
 if __name__ == "__main__":
