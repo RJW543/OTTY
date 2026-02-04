@@ -123,7 +123,7 @@ class KioskLauncher:
         
         subtitle = tk.Label(
             main,
-            text="Encrypted Messaging • Voice Calls • Bluetooth Key Exchange",
+            text="Encrypted Messaging - Voice Calls - Bluetooth Key Exchange",
             font=("Helvetica", 12),
             fg='#8b949e',
             bg='#0d1117'
@@ -172,7 +172,7 @@ class KioskLauncher:
         # Separator
         tk.Label(
             main,
-            text="─────────  or launch directly  ─────────",
+            text="---------  or launch directly  ---------",
             font=("Helvetica", 9),
             fg='#484f58',
             bg='#0d1117'
@@ -379,7 +379,7 @@ class KioskLauncher:
             )
         elif optional_missing:
             self.deps_status.config(
-                text=f"ℹ️ Optional: {', '.join(optional_missing)}",
+                text=f"[i] Optional: {', '.join(optional_missing)}",
                 fg='#d29922'
             )
         else:
@@ -542,7 +542,7 @@ def main():
         messagebox.showerror(
             "Missing Required Files",
             f"The following required files were not found in {APP_DIR}:\n\n" +
-            "\n".join(f"• {f}" for f in missing_required) +
+            "\n".join(f"- {f}" for f in missing_required) +
             "\n\nCannot start kiosk."
         )
         return

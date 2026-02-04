@@ -372,7 +372,7 @@ class OTPBluetoothShareApp:
     def show_bt_error(self):
         frame = tk.Frame(self.master, bg='#0d1117')
         frame.place(relx=0.5, rely=0.5, anchor='center')
-        tk.Label(frame, text="⚠️ Bluetooth Not Available", font=("Helvetica", 20, "bold"),
+        tk.Label(frame, text="[!] Bluetooth Not Available", font=("Helvetica", 20, "bold"),
                 fg='#f85149', bg='#0d1117').pack(pady=20)
         tk.Label(frame, text="sudo apt install bluetooth bluez libbluetooth-dev\npip install pybluez",
                 font=("Consolas", 11), fg='#8b949e', bg='#0d1117').pack()
@@ -382,7 +382,7 @@ class OTPBluetoothShareApp:
         main.pack(fill=tk.BOTH, expand=True, padx=20, pady=20)
         
         # Header
-        tk.Label(main, text="📡 Bluetooth Pad Share", font=("Helvetica", 22, "bold"),
+        tk.Label(main, text="[B] Bluetooth Pad Share", font=("Helvetica", 22, "bold"),
                 fg='#c9d1d9', bg='#0d1117').pack(anchor='w')
         tk.Label(main, text="Share per-contact cipher pads via Bluetooth",
                 font=("Helvetica", 11), fg='#8b949e', bg='#0d1117').pack(anchor='w', pady=(0, 15))
@@ -398,11 +398,11 @@ class OTPBluetoothShareApp:
         notebook.pack(fill=tk.BOTH, expand=True)
         
         send_frame = tk.Frame(notebook, bg='#0d1117')
-        notebook.add(send_frame, text="📤 Send Pad")
+        notebook.add(send_frame, text="[>] Send Pad")
         self.setup_send_tab(send_frame)
         
         recv_frame = tk.Frame(notebook, bg='#0d1117')
-        notebook.add(recv_frame, text="📥 Receive Pad")
+        notebook.add(recv_frame, text="[<] Receive Pad")
         self.setup_recv_tab(recv_frame)
         
         # Log
@@ -444,7 +444,7 @@ class OTPBluetoothShareApp:
         btn_row = tk.Frame(c, bg='#0d1117')
         btn_row.pack(anchor='w', pady=(0, 5))
         
-        self.scan_btn = tk.Button(btn_row, text="🔍 Scan", command=self.scan,
+        self.scan_btn = tk.Button(btn_row, text="[?] Scan", command=self.scan,
             font=("Helvetica", 10), bg='#238636', fg='white', relief='flat', padx=15, pady=5)
         self.scan_btn.pack(side=tk.LEFT)
         
@@ -457,7 +457,7 @@ class OTPBluetoothShareApp:
         self.device_list.bind('<<ListboxSelect>>', self.on_device_sel)
         
         # Send button
-        self.send_btn = tk.Button(c, text="📤 Send Cipher Pad", command=self.send_pad,
+        self.send_btn = tk.Button(c, text="[>] Send Cipher Pad", command=self.send_pad,
             font=("Helvetica", 12, "bold"), bg='#238636', fg='white', relief='flat',
             padx=30, pady=10, state=tk.DISABLED)
         self.send_btn.pack(pady=10)
@@ -485,11 +485,11 @@ class OTPBluetoothShareApp:
         tk.Label(c, text="2. Start receiving:", font=("Helvetica", 11, "bold"),
                 fg='#c9d1d9', bg='#0d1117').pack(anchor='w', pady=(0, 5))
         
-        self.recv_btn = tk.Button(c, text="📥 Start Receiving", command=self.start_recv,
+        self.recv_btn = tk.Button(c, text="[<] Start Receiving", command=self.start_recv,
             font=("Helvetica", 12, "bold"), bg='#238636', fg='white', relief='flat', padx=30, pady=10)
         self.recv_btn.pack(pady=5)
         
-        self.stop_btn = tk.Button(c, text="⏹ Stop", command=self.stop_recv,
+        self.stop_btn = tk.Button(c, text="[] Stop", command=self.stop_recv,
             font=("Helvetica", 10), bg='#f85149', fg='white', relief='flat', padx=20, pady=5)
         
         self.recv_status = tk.Label(c, text="", fg='#8b949e', bg='#0d1117')

@@ -181,7 +181,7 @@ class OTPClientGUI:
                                           command=self.disconnect, state=tk.DISABLED)
         self.disconnect_btn.pack(side=tk.LEFT, padx=(5, 0))
         
-        self.status_label = ttk.Label(conn_frame, text="● Disconnected", foreground="red")
+        self.status_label = ttk.Label(conn_frame, text="* Disconnected", foreground="red")
         self.status_label.pack(anchor=tk.W, pady=(5, 0))
         
         # --- OTP Status ---
@@ -195,7 +195,7 @@ class OTPClientGUI:
         self.recipient_status.pack(anchor=tk.W)
         
         # Open Manager button
-        ttk.Button(otp_frame, text="📋 Open OTP Manager", 
+        ttk.Button(otp_frame, text="[O] Open OTP Manager", 
                   command=self.open_manager).pack(anchor=tk.W, pady=(5, 0))
         
         # --- Chat ---
@@ -280,31 +280,31 @@ class OTPClientGUI:
         
         if not self.otp.contact_has_pad(self.current_recipient):
             self.recipient_pages_label.config(
-                text=f"⚠️ No pad for {self.current_recipient[:8]}...",
+                text=f"! No pad for {self.current_recipient[:8]}...",
                 foreground='#cc0000'
             )
         else:
             available = self.otp.get_available_count(self.current_recipient)
             if available == 0:
                 self.recipient_pages_label.config(
-                    text="⚠️ No pages left!",
+                    text="! No pages left!",
                     foreground='#cc0000'
                 )
             elif available < 10:
                 self.recipient_pages_label.config(
-                    text=f"⚠️ Low: {available} pages",
+                    text=f"! Low: {available} pages",
                     foreground='#cc6600'
                 )
             else:
                 self.recipient_pages_label.config(
-                    text=f"✓ {available} pages",
+                    text=f"+ {available} pages",
                     foreground='#006600'
                 )
     
     def update_otp_status(self):
         """Update overall OTP status."""
         if not self.otp:
-            self.otp_status.config(text="⚠️ OTP Helper not available", foreground='red')
+            self.otp_status.config(text="! OTP Helper not available", foreground='red')
             return
         
         stats = self.otp.get_statistics()
@@ -373,7 +373,7 @@ class OTPClientGUI:
             self.user_id = username
             self.connected = True
             
-            self.status_label.config(text=f"● Connected as '{username}'", foreground='green')
+            self.status_label.config(text=f"* Connected as '{username}'", foreground='green')
             self.connect_btn.config(state=tk.DISABLED)
             self.disconnect_btn.config(state=tk.NORMAL)
             self.send_btn.config(state=tk.NORMAL)
@@ -403,7 +403,7 @@ class OTPClientGUI:
                 pass
             self.client_socket = None
         
-        self.status_label.config(text="● Disconnected", foreground='red')
+        self.status_label.config(text="* Disconnected", foreground='red')
         self.connect_btn.config(state=tk.NORMAL)
         self.disconnect_btn.config(state=tk.DISABLED)
         self.send_btn.config(state=tk.DISABLED)
@@ -567,9 +567,9 @@ def main():
         "1. Generate a pad for them (OTP Manager)\n"
         "2. Share the pad via Bluetooth when you meet\n\n"
         "Perfect secrecy requires:\n"
-        "• Truly random pads\n"
-        "• Each page used only once\n"
-        "• Pads kept secret"
+        "- Truly random pads\n"
+        "- Each page used only once\n"
+        "- Pads kept secret"
     )
     
     app = OTPClientGUI(root)

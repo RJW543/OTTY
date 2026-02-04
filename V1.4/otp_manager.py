@@ -477,7 +477,7 @@ class OTPManagerApp:
         
         tk.Label(
             header,
-            text="🔑 OTP Manager",
+            text="[K] OTP Manager",
             font=("Helvetica", 24, "bold"),
             fg='#c9d1d9',
             bg='#0d1117'
@@ -506,7 +506,7 @@ class OTPManagerApp:
         
         tk.Label(
             info_frame,
-            text="ℹ️ Each contact has their own unique cipher pad. "
+            text="[i] Each contact has their own unique cipher pad. "
                  "A pad shared with Alice is NEVER used with Bob.",
             font=("Helvetica", 10),
             fg='#58a6ff',
@@ -540,7 +540,7 @@ class OTPManagerApp:
         
         tk.Label(
             header,
-            text="👥 Contacts with Pads",
+            text="[U] Contacts with Pads",
             font=("Helvetica", 12, "bold"),
             fg='#c9d1d9',
             bg='#161b22'
@@ -569,7 +569,7 @@ class OTPManagerApp:
         
         tk.Button(
             btn_frame,
-            text="🆕 New Pad for Contact",
+            text="[N] New Pad for Contact",
             command=self.new_pad_dialog,
             font=("Helvetica", 10),
             bg='#238636',
@@ -583,7 +583,7 @@ class OTPManagerApp:
         
         tk.Button(
             btn_frame,
-            text="📡 Bluetooth Share",
+            text="[B] Bluetooth Share",
             command=self.open_bluetooth,
             font=("Helvetica", 10),
             bg='#1f6feb',
@@ -712,7 +712,7 @@ class OTPManagerApp:
         
         self.generate_btn = tk.Button(
             actions,
-            text="🎲 Generate New Pad",
+            text="[G] Generate New Pad",
             command=self.generate_pad,
             font=("Helvetica", 10),
             bg='#238636',
@@ -729,7 +729,7 @@ class OTPManagerApp:
         
         self.cleanup_btn = tk.Button(
             actions,
-            text="🧹 Remove Used Pages",
+            text="[D] Remove Used Pages",
             command=self.cleanup_used,
             font=("Helvetica", 10),
             bg='#d29922',
@@ -746,7 +746,7 @@ class OTPManagerApp:
         
         self.delete_btn = tk.Button(
             actions,
-            text="🗑️ Delete Entire Pad",
+            text="[X] Delete Entire Pad",
             command=self.delete_pad,
             font=("Helvetica", 10),
             bg='#f85149',
@@ -787,7 +787,7 @@ class OTPManagerApp:
             available = total - used
             name = get_contact_name(contact_id, self.contacts)
             
-            status = "✓" if available > 0 else "⚠"
+            status = "[ok]" if available > 0 else "[!]"
             display = f"{status} {name} ({available}/{total})"
             self.contacts_listbox.insert(tk.END, display)
     
@@ -811,7 +811,7 @@ class OTPManagerApp:
         contact_id = self.selected_contact
         name = get_contact_name(contact_id, self.contacts)
         
-        self.detail_title.config(text=f"📋 {name}'s Cipher Pad")
+        self.detail_title.config(text=f"[O] {name}'s Cipher Pad")
         
         if not self.manager.has_pad(contact_id):
             self.pages_total_label.config(text="No pad exists")
@@ -836,7 +836,7 @@ class OTPManagerApp:
         if info:
             created = info.get('created', 'Unknown')[:10]
             source = info.get('source', 'Unknown')
-            hwrng = "✓ HWRNG" if info.get('hwrng_used') else "urandom"
+            hwrng = "[ok] HWRNG" if info.get('hwrng_used') else "urandom"
             self.meta_label.config(text=f"Created: {created} | Source: {source} | RNG: {hwrng}")
         else:
             self.meta_label.config(text="")
@@ -856,7 +856,7 @@ class OTPManagerApp:
             preview = content[:35] + "..." if len(content) > 35 else content
             page_hash = hashlib.sha256(page.encode()).hexdigest()[:10]
             
-            status = "🔴 Used" if page_id in used_ids else "🟢 Available"
+            status = "[X] Used" if page_id in used_ids else "[O] Available"
             
             self.pages_tree.insert('', tk.END, values=(status, page_id, preview, page_hash))
         
@@ -940,7 +940,7 @@ class OTPManagerApp:
         # Show all contacts but warn about existing pads
         contact_options = [
             f"{get_contact_name(cid, self.contacts)} ({cid})" + 
-            (" ⚠️ has pad" if cid in contacts_with_pads else "")
+            (" [!] has pad" if cid in contacts_with_pads else "")
             for cid in all_contacts
         ]
         
@@ -1018,7 +1018,7 @@ class OTPManagerApp:
             
             # Extract contact ID
             selection = contact_var.get()
-            contact_id = selection.split('(')[-1].rstrip(')').replace(' ⚠️ has pad', '')
+            contact_id = selection.split('(')[-1].rstrip(')').replace(' [!] has pad', '')
             
             # Check if already has pad
             if self.manager.has_pad(contact_id):
@@ -1116,8 +1116,8 @@ class OTPManagerApp:
         if not messagebox.askyesno(
             "Confirm Delete",
             f"Delete the ENTIRE cipher pad for {name}?\n\n"
-            "⚠️ This cannot be undone!\n"
-            "⚠️ You will not be able to communicate with {name} until you share a new pad!"
+            "[!] This cannot be undone!\n"
+            "[!] You will not be able to communicate with {name} until you share a new pad!"
         ):
             return
         

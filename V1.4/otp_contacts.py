@@ -235,7 +235,7 @@ class DeviceSetupDialog:
         
         tk.Label(
             header_frame,
-            text="🔧",
+            text="[W]",
             font=("Helvetica", 36),
             fg='#58a6ff',
             bg='#0d1117'
@@ -319,7 +319,7 @@ class DeviceSetupDialog:
         
         self.confirm_btn = tk.Button(
             btn_frame,
-            text="✓ Confirm Setup",
+            text="+ Confirm Setup",
             font=("Helvetica", 11),
             width=15,
             height=2,
@@ -335,7 +335,7 @@ class DeviceSetupDialog:
         
         tk.Button(
             btn_frame,
-            text="✕ Exit",
+            text="x Exit",
             font=("Helvetica", 11),
             width=10,
             height=2,
@@ -429,7 +429,7 @@ class AddContactDialog:
         # Header
         tk.Label(
             self.dialog,
-            text="👤 Add New Contact",
+            text="[@] Add New Contact",
             font=("Helvetica", 16, "bold"),
             fg='#c9d1d9',
             bg='#0d1117'
@@ -498,7 +498,7 @@ class AddContactDialog:
         
         self.add_btn = tk.Button(
             btn_frame,
-            text="✓ Add Contact",
+            text="+ Add Contact",
             font=("Helvetica", 11),
             width=12,
             bg='#238636',
@@ -541,7 +541,7 @@ class AddContactDialog:
                 self.id_hint.config(text="Cannot add yourself!", fg='#f85149')
                 self.add_btn.config(state=tk.DISABLED)
             else:
-                self.id_hint.config(text=f"✓ Valid ID", fg='#3fb950')
+                self.id_hint.config(text=f"+ Valid ID", fg='#3fb950')
                 self.add_btn.config(state=tk.NORMAL)
         else:
             self.id_hint.config(text=f"{length}/{ID_LENGTH} characters", fg='#6e7681')
@@ -589,7 +589,7 @@ class EditContactDialog:
         # Header
         tk.Label(
             self.dialog,
-            text="✏️ Edit Contact",
+            text="[E] Edit Contact",
             font=("Helvetica", 16, "bold"),
             fg='#c9d1d9',
             bg='#0d1117'
@@ -669,7 +669,7 @@ class EditContactDialog:
         
         tk.Button(
             btn_frame,
-            text="✓ Save",
+            text="+ Save",
             font=("Helvetica", 11),
             width=10,
             bg='#238636',
@@ -681,7 +681,7 @@ class EditContactDialog:
         
         tk.Button(
             btn_frame,
-            text="🗑 Delete",
+            text="[X] Delete",
             font=("Helvetica", 11),
             width=10,
             bg='#da3633',
@@ -776,7 +776,7 @@ class ContactsApp:
         
         tk.Label(
             header_frame,
-            text="📱 Contacts",
+            text="[C] Contacts",
             font=("Helvetica", 20, "bold"),
             fg='#c9d1d9',
             bg='#161b22'
@@ -855,7 +855,7 @@ class ContactsApp:
         # OTP Manager button
         manager_btn = tk.Button(
             action_frame,
-            text="🔑 OTP Manager",
+            text="[K] OTP Manager",
             font=("Helvetica", 10),
             bg='#8957e5',
             fg='white',
@@ -918,7 +918,7 @@ class ContactsApp:
         # Message button
         self.msg_btn = tk.Button(
             btn_row,
-            text="📨 Message",
+            text="[M] Message",
             font=("Helvetica", 11),
             width=12,
             height=2,
@@ -934,7 +934,7 @@ class ContactsApp:
         # Call button
         self.call_btn = tk.Button(
             btn_row,
-            text="🎤 Voice Call",
+            text="[V] Voice Call",
             font=("Helvetica", 11),
             width=12,
             height=2,
@@ -950,7 +950,7 @@ class ContactsApp:
         # Edit button
         self.edit_btn = tk.Button(
             btn_row,
-            text="✏️ Edit",
+            text="[E] Edit",
             font=("Helvetica", 11),
             width=10,
             height=2,
@@ -990,7 +990,7 @@ class ContactsApp:
         """Copy device ID to clipboard."""
         self.master.clipboard_clear()
         self.master.clipboard_append(self.config.device_id)
-        self.status_bar.config(text="✓ Device ID copied to clipboard")
+        self.status_bar.config(text="+ Device ID copied to clipboard")
         self.master.after(2000, lambda: self.status_bar.config(text=""))
     
     def refresh_contacts(self):
@@ -1113,7 +1113,7 @@ class ContactsApp:
             
             if success:
                 self.refresh_contacts()
-                self.status_bar.config(text=f"✓ Added contact: {nickname}")
+                self.status_bar.config(text=f"+ Added contact: {nickname}")
             else:
                 messagebox.showerror("Error", message)
     

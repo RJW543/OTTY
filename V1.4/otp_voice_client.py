@@ -388,7 +388,7 @@ class VoiceClientGUI:
         self.disconnect_button.pack(side=tk.LEFT, padx=(5, 0))
         
         # Status
-        self.status_label = ttk.Label(conn_frame, text="● Disconnected", foreground="red")
+        self.status_label = ttk.Label(conn_frame, text="* Disconnected", foreground="red")
         self.status_label.pack(anchor=tk.W, pady=(5, 0))
         
         # --- Room Section ---
@@ -404,7 +404,7 @@ class VoiceClientGUI:
         self.room_entry.pack(side=tk.LEFT, padx=(5, 10))
         
         ttk.Label(room_row1, text="Password:").pack(side=tk.LEFT)
-        self.room_pass_entry = ttk.Entry(room_row1, width=15, show="•")
+        self.room_pass_entry = ttk.Entry(room_row1, width=15, show="-")
         self.room_pass_entry.pack(side=tk.LEFT, padx=(5, 0))
         
         # Room controls row 2
@@ -455,7 +455,7 @@ class VoiceClientGUI:
         if recipient_from_env and recipient_name and recipient_name != recipient_from_env:
             self.calling_label = ttk.Label(
                 participants_frame,
-                text=f"📞 Calling: {recipient_name}",
+                text=f"[T] Calling: {recipient_name}",
                 foreground='#8957e5',
                 font=("Helvetica", 10, "bold")
             )
@@ -481,7 +481,7 @@ class VoiceClientGUI:
         # Push-to-talk button (larger)
         self.ptt_button = tk.Button(
             controls_row,
-            text="🎤 PUSH TO TALK",
+            text="[V] PUSH TO TALK",
             font=("Helvetica", 12, "bold"),
             bg='#333333',
             fg='white',
@@ -539,7 +539,7 @@ class VoiceClientGUI:
             missing.append("cryptography")
         
         if missing:
-            self.log_message(f"⚠️  Missing: {', '.join(missing)}")
+            self.log_message(f"!  Missing: {', '.join(missing)}")
             self.log_message("Install with: pip install " + " ".join(missing))
     
     def log_message(self, message):
@@ -604,7 +604,7 @@ class VoiceClientGUI:
             self.connected = True
             
             # Update UI
-            self.status_label.config(text=f"● Connected as '{username}'", foreground="green")
+            self.status_label.config(text=f"* Connected as '{username}'", foreground="green")
             self.connect_button.config(state=tk.DISABLED)
             self.disconnect_button.config(state=tk.NORMAL)
             self.create_room_btn.config(state=tk.NORMAL)
@@ -648,7 +648,7 @@ class VoiceClientGUI:
             self.audio_handler.stop()
         
         # Update UI
-        self.status_label.config(text="● Disconnected", foreground="red")
+        self.status_label.config(text="* Disconnected", foreground="red")
         self.connect_button.config(state=tk.NORMAL)
         self.disconnect_button.config(state=tk.DISABLED)
         self.create_room_btn.config(state=tk.DISABLED)
@@ -761,7 +761,7 @@ class VoiceClientGUI:
             # Update participants list
             self.participants_list.delete(0, tk.END)
             for participant in sorted(self.current_room.participants):
-                prefix = "👑 " if participant == self.user_id else "👤 "
+                prefix = "[*] " if participant == self.user_id else "[@] "
                 self.participants_list.insert(tk.END, f"{prefix}{participant}")
         else:
             self.room_status.config(text="Not in a room", foreground="gray")
@@ -785,7 +785,7 @@ class VoiceClientGUI:
             return
         
         self.is_transmitting = True
-        self.ptt_button.config(bg='#00aa00', text="🎤 TRANSMITTING...")
+        self.ptt_button.config(bg='#00aa00', text="[V] TRANSMITTING...")
         
         # Start audio capture in a thread
         self.audio_thread = threading.Thread(target=self.audio_capture_loop, daemon=True)
@@ -797,7 +797,7 @@ class VoiceClientGUI:
             return
         
         self.is_transmitting = False
-        self.ptt_button.config(bg='#333333', text="🎤 PUSH TO TALK")
+        self.ptt_button.config(bg='#333333', text="[V] PUSH TO TALK")
         self.update_audio_level(0)
     
     def audio_capture_loop(self):
@@ -854,10 +854,10 @@ class VoiceClientGUI:
         """Toggle between push-to-talk and continuous modes."""
         self.push_to_talk = self.ptt_var.get()
         if self.push_to_talk:
-            self.ptt_button.config(text="🎤 PUSH TO TALK")
+            self.ptt_button.config(text="[V] PUSH TO TALK")
             self.log_message("Push-to-talk mode enabled")
         else:
-            self.ptt_button.config(text="🎤 TOGGLE MIC")
+            self.ptt_button.config(text="[V] TOGGLE MIC")
             self.log_message("Continuous mode enabled - click to toggle")
     
     def handle_space_press(self, event):
@@ -1022,7 +1022,7 @@ class VoiceClientGUI:
             password = simpledialog.askstring(
                 "Room Password",
                 f"Enter the password for room '{room_id}':",
-                show='•'
+                show='-'
             )
             
             if password:
@@ -1046,7 +1046,7 @@ class VoiceClientGUI:
         if self.audio_handler:
             self.audio_handler.stop()
         
-        self.status_label.config(text="● Disconnected", foreground="red")
+        self.status_label.config(text="* Disconnected", foreground="red")
         self.connect_button.config(state=tk.NORMAL)
         self.disconnect_button.config(state=tk.DISABLED)
         self.host_entry.config(state=tk.NORMAL)
@@ -1079,8 +1079,8 @@ def show_disclaimer():
         "Voice data is encrypted using AES-256-GCM.\n"
         "Security depends on keeping the room password secret.\n\n"
         "Requirements:\n"
-        "• pyaudio - for audio capture/playback\n"
-        "• cryptography - for AES encryption"
+        "- pyaudio - for audio capture/playback\n"
+        "- cryptography - for AES encryption"
     )
     messagebox.showinfo("OTP Voice Client", disclaimer)
 

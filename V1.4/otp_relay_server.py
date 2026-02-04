@@ -160,7 +160,7 @@ class RelayServerGUI:
         status_frame.pack(fill=tk.X, pady=(0, 10))
         
         self.status_indicator = tk.Label(
-            status_frame, text="● STOPPED", fg="red", font=("Arial", 14, "bold")
+            status_frame, text="* STOPPED", fg="red", font=("Arial", 14, "bold")
         )
         self.status_indicator.pack(side=tk.LEFT)
         
@@ -283,7 +283,7 @@ class RelayServerGUI:
             self.server_thread.start()
             
             # Update UI state
-            self.status_indicator.config(text="● RUNNING", fg="green")
+            self.status_indicator.config(text="* RUNNING", fg="green")
             self.start_button.config(state=tk.DISABLED)
             self.stop_button.config(state=tk.NORMAL)
             self.port_entry.config(state=tk.DISABLED)
@@ -327,7 +327,7 @@ class RelayServerGUI:
         self.ngrok_tunnel = None
         
         # Update UI
-        self.status_indicator.config(text="● STOPPED", fg="red")
+        self.status_indicator.config(text="* STOPPED", fg="red")
         self.ngrok_label.config(text="Ngrok: Not started", foreground="gray")
         self.connection_info.config(text="")
         self.start_button.config(state=tk.NORMAL)

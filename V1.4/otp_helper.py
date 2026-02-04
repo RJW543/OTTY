@@ -224,7 +224,7 @@ if __name__ == "__main__":
     if stats['contacts']:
         print("Per-contact breakdown:")
         for contact_id, data in stats['contacts'].items():
-            print(f"  📄 {contact_id}")
+            print(f"  [P] {contact_id}")
             print(f"     Total: {data['total']:,} | Available: {data['available']:,} | Used: {data['used']:,}")
     else:
         print("No contacts have cipher pads yet.")
