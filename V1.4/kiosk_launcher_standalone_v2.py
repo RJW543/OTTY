@@ -5,15 +5,17 @@ Run this directly to get a kiosk-style interface without system configuration.
 
 Includes:
 - Contacts Hub (central communication manager)
+- OTP Manager (per-contact cipher pad management)
 - OTP Text Messenger (OTP encryption)
 - OTP Voice Client (AES-256 encrypted calls)
 - OTP Bluetooth Share (secure key exchange)
 - OTP Generator (Hardware RNG)
 - Relay Server
 
-Usage: python3 kiosk_launcher_standalone.py
+Usage: python3 kiosk_launcher_standalone_v2.py
 
-For testing: Press Escape 3 times quickly to exit fullscreen
+Note: Uses maximized window instead of fullscreen for VirtualBox compatibility.
+For testing: Press Escape 3 times quickly to exit, or close the window.
 For production: Set PRODUCTION_MODE = True below
 """
 
@@ -37,8 +39,19 @@ class KioskLauncher:
         self.master = master
         self.master.title("OTP Secure Communications")
         
-        # Fullscreen
-        self.master.attributes('-fullscreen', True)
+        # Use maximized window instead of fullscreen (fixes VirtualBox segfault)
+        # Set a large default size
+        self.master.geometry("1024x768")
+        
+        # Try to maximize, but don't use fullscreen (causes segfault in VirtualBox)
+        try:
+            self.master.state('zoomed')  # Windows
+        except:
+            try:
+                self.master.attributes('-zoomed', True)  # Linux
+            except:
+                pass  # Fall back to geometry size
+        
         self.master.configure(bg='#0d1117')
         
         # Escape handling
@@ -320,9 +333,9 @@ class KioskLauncher:
         self.deps_status.pack(pady=(5, 0))
         
         # Footer
-        footer_text = "Kiosk Mode Active"
+        footer_text = "OTP Secure Communications"
         if not PRODUCTION_MODE:
-            footer_text += " | Press ESC 3x to exit"
+            footer_text += " | Press ESC 3x or close window to exit"
         
         footer = tk.Label(
             self.master,
