@@ -516,16 +516,24 @@ def main():
     root = tk.Tk()
     
     # Check if required files exist
-    required = ["otp_contacts.py", "otp_client.py"]
+    # Note: otp_client_v2.py OR otp_client.py is acceptable
+    required = ["otp_contacts.py"]
     optional = [
         "otp_relay_server.py",
         "otp_relay_server_voice.py",
         "otp_voice_client.py",
         "otp_generator.py",
-        "otp_bluetooth_share.py"
+        "otp_bluetooth_share.py",
+        "otp_manager.py"
     ]
     
     missing_required = [f for f in required if not (APP_DIR / f).exists()]
+    
+    # Check for at least one client version
+    has_client = (APP_DIR / "otp_client_v2.py").exists() or (APP_DIR / "otp_client.py").exists()
+    if not has_client:
+        missing_required.append("otp_client_v2.py (or otp_client.py)")
+    
     missing_optional = [f for f in optional if not (APP_DIR / f).exists()]
     
     if missing_required:
