@@ -39,19 +39,8 @@ class KioskLauncher:
         self.master = master
         self.master.title("OTP Secure Communications")
         
-        # Use maximized window instead of fullscreen (fixes VirtualBox segfault)
-        # Set a large default size
-        self.master.geometry("1024x768")
-        
-        # Try to maximize, but don't use fullscreen (causes segfault in VirtualBox)
-        try:
-            self.master.state('zoomed')  # Windows
-        except:
-            try:
-                self.master.attributes('-zoomed', True)  # Linux
-            except:
-                pass  # Fall back to geometry size
-        
+        # Simple window setup - no special attributes (VirtualBox compatible)
+        self.master.geometry("1200x800")
         self.master.configure(bg='#0d1117')
         
         # Escape handling
@@ -116,7 +105,7 @@ class KioskLauncher:
         # Header
         header = tk.Label(
             main,
-            text="🔐",
+            text="[=]",
             font=("Helvetica", 48),
             fg='#58a6ff',
             bg='#0d1117'
@@ -165,7 +154,7 @@ class KioskLauncher:
         # MAIN CONTACTS BUTTON (Primary action)
         contacts_btn = tk.Button(
             main,
-            text="📱  Open Contacts",
+            text="[C]  Open Contacts",
             command=self.launch_contacts,
             font=("Helvetica", 16, "bold"),
             width=24,
@@ -224,7 +213,7 @@ class KioskLauncher:
         # Left column - Communication
         comm_label = tk.Label(
             left_col,
-            text="📡 Communication",
+            text="[B] Communication",
             font=("Helvetica", 10, "bold"),
             fg='#8b949e',
             bg='#0d1117'
@@ -234,7 +223,7 @@ class KioskLauncher:
         # Messenger button
         client_btn = create_button(
             left_col,
-            "📨  Text Messenger",
+            "[M]  Text Messenger",
             self.launch_client
         )
         client_btn.pack(pady=5)
@@ -242,7 +231,7 @@ class KioskLauncher:
         # Voice button
         voice_btn = create_button(
             left_col,
-            "🎤  Voice Calls",
+            "[V]  Voice Calls",
             self.launch_voice
         )
         voice_btn.pack(pady=5)
@@ -250,7 +239,7 @@ class KioskLauncher:
         # Center column - Key Management
         key_label = tk.Label(
             center_col,
-            text="🔑 Key Management",
+            text="[K] Key Management",
             font=("Helvetica", 10, "bold"),
             fg='#8b949e',
             bg='#0d1117'
@@ -260,7 +249,7 @@ class KioskLauncher:
         # OTP Manager button (highlighted - important for per-contact pads)
         manager_btn = create_button(
             center_col,
-            "📋  OTP Manager",
+            "[O]  OTP Manager",
             self.launch_manager,
             color='#8957e5'  # Purple highlight
         )
@@ -269,7 +258,7 @@ class KioskLauncher:
         # Bluetooth Share button
         bt_btn = create_button(
             center_col,
-            "📡  Bluetooth Share",
+            "[B]  Bluetooth Share",
             self.launch_bluetooth,
             color='#1f6feb'  # Blue highlight
         )
@@ -278,7 +267,7 @@ class KioskLauncher:
         # Generator button
         gen_btn = create_button(
             center_col,
-            "🎲  OTP Generator",
+            "[G]  OTP Generator",
             self.launch_generator
         )
         gen_btn.pack(pady=5)
@@ -286,7 +275,7 @@ class KioskLauncher:
         # Right column - System
         sys_label = tk.Label(
             right_col,
-            text="⚙️ System",
+            text="[*] System",
             font=("Helvetica", 10, "bold"),
             fg='#8b949e',
             bg='#0d1117'
@@ -296,7 +285,7 @@ class KioskLauncher:
         # Server button
         server_btn = create_button(
             right_col,
-            "🖥️  Relay Server",
+            "[S]  Relay Server",
             self.launch_server
         )
         server_btn.pack(pady=5)
@@ -385,7 +374,7 @@ class KioskLauncher:
         
         if missing:
             self.deps_status.config(
-                text=f"⚠️ Required: pip install {' '.join(missing)}",
+                text=f"[!] Required: pip install {' '.join(missing)}",
                 fg='#f85149'
             )
         elif optional_missing:
@@ -395,7 +384,7 @@ class KioskLauncher:
             )
         else:
             self.deps_status.config(
-                text="✓ All dependencies installed",
+                text="[ok] All dependencies installed",
                 fg='#3fb950'
             )
     
@@ -444,27 +433,27 @@ class KioskLauncher:
                 total_available = total_pages - used
                 
                 self.otp_status.config(
-                    text=f"⚠️ Legacy mode: {total_available} pages - Use OTP Manager to set up per-contact pads",
+                    text=f"[!] Legacy mode: {total_available} pages - Use OTP Manager to set up per-contact pads",
                     fg='#d29922'
                 )
             else:
                 self.otp_status.config(
-                    text="⚠️ No OTP pads found - Use OTP Manager to generate pads",
+                    text="[!] No OTP pads found - Use OTP Manager to generate pads",
                     fg='#f85149'
                 )
         elif total_available == 0:
             self.otp_status.config(
-                text=f"⚠️ {num_contacts} contact(s) but no pages left!",
+                text=f"[!] {num_contacts} contact(s) but no pages left!",
                 fg='#f85149'
             )
         elif total_available < 100:
             self.otp_status.config(
-                text=f"⚠️ Low: {total_available} pages across {num_contacts} contact(s)",
+                text=f"[!] Low: {total_available} pages across {num_contacts} contact(s)",
                 fg='#d29922'
             )
         else:
             self.otp_status.config(
-                text=f"✓ {total_available:,} pages across {num_contacts} contact pad(s)",
+                text=f"[ok] {total_available:,} pages across {num_contacts} contact pad(s)",
                 fg='#3fb950'
             )
         
