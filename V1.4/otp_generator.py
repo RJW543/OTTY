@@ -85,12 +85,12 @@ def get_rng_device():
                 f.read(1)  # Test read
             return PI_HWRNG_DEVICE, "Hardware RNG (Pi)", True
         except PermissionError:
-            # Hardware RNG exists but needs sudo
-            return PI_HWRNG_DEVICE, "Hardware RNG (Pi) - needs sudo", True
+            # Hardware RNG exists but needs sudo - fall back to urandom
+            pass
         except:
             pass
     
-    # Fall back to urandom
+    # Use urandom (available on all Linux systems, no sudo needed)
     if os.path.exists(URANDOM_DEVICE):
         return URANDOM_DEVICE, "/dev/urandom (CSPRNG)", False
     
