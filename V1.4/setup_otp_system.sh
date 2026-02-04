@@ -187,6 +187,13 @@ AUDIO_PACKAGES=(
     "alsa-utils"
 )
 
+# Bluetooth packages (for key exchange)
+BLUETOOTH_PACKAGES=(
+    "bluetooth"
+    "bluez"
+    "libbluetooth-dev"
+)
+
 # GUI packages (for kiosk mode)
 GUI_PACKAGES=(
     "xorg"
@@ -202,6 +209,10 @@ echo_status "Python packages installed"
 echo_step "Installing audio packages (for voice calls)..."
 apt-get install -y -qq "${AUDIO_PACKAGES[@]}"
 echo_status "Audio packages installed"
+
+echo_step "Installing Bluetooth packages (for key exchange)..."
+apt-get install -y -qq "${BLUETOOTH_PACKAGES[@]}" 2>/dev/null || echo_warn "Some Bluetooth packages not available"
+echo_status "Bluetooth packages installed"
 
 if [ "$SETUP_KIOSK" = true ]; then
     echo_step "Installing GUI packages (for kiosk mode)..."
@@ -235,6 +246,9 @@ echo_status "PyAudio installed"
 echo_step "Installing pyttsx3 (text-to-speech, optional)..."
 pip3 install pyttsx3 $PIP_FLAGS -q 2>/dev/null || echo_warn "pyttsx3 not available (optional)"
 
+echo_step "Installing pybluez (Bluetooth key exchange, optional)..."
+pip3 install pybluez $PIP_FLAGS -q 2>/dev/null || echo_warn "pybluez not available (run setup_bluetooth.sh for full Bluetooth support)"
+
 # --- Step 4: Create Installation Directory ---
 echo_header "Step 4: Setting Up Application Directory"
 
@@ -244,13 +258,17 @@ mkdir -p "$INSTALL_DIR"
 # Copy application files if they exist in the script directory
 APP_FILES=(
     "otp_contacts.py"
+    "otp_client_v2.py"
     "otp_client.py"
     "otp_voice_client.py"
     "otp_relay_server_voice.py"
     "otp_relay_server.py"
+    "otp_manager.py"
+    "otp_bluetooth_share.py"
+    "otp_helper.py"
     "otp_generator.py"
-    "kiosk_launcher_standalone.py"
-    "get_username.py"
+    "kiosk_launcher_standalone_v2.py"
+    "setup_bluetooth.sh"
 )
 
 FOUND_FILES=0
@@ -267,10 +285,28 @@ if [ $FOUND_FILES -eq 0 ]; then
     echo_info "Please copy the .py files to $INSTALL_DIR manually"
 fi
 
-# Copy OTP cipher file if exists
+# Copy OTP cipher file if exists (legacy support)
 if [ -f "$SCRIPT_DIR/otp_cipher.txt" ]; then
     cp "$SCRIPT_DIR/otp_cipher.txt" "$INSTALL_DIR/"
-    echo_status "Copied otp_cipher.txt"
+    echo_status "Copied otp_cipher.txt (legacy)"
+fi
+
+# Copy per-contact pad data if exists
+if [ -d "$SCRIPT_DIR/otp_data" ]; then
+    cp -r "$SCRIPT_DIR/otp_data" "$INSTALL_DIR/"
+    echo_status "Copied otp_data/ (per-contact pads)"
+fi
+
+# Copy contacts if exists
+if [ -f "$SCRIPT_DIR/contacts.json" ]; then
+    cp "$SCRIPT_DIR/contacts.json" "$INSTALL_DIR/"
+    echo_status "Copied contacts.json"
+fi
+
+# Copy device config if exists
+if [ -f "$SCRIPT_DIR/device_config.json" ]; then
+    cp "$SCRIPT_DIR/device_config.json" "$INSTALL_DIR/"
+    echo_status "Copied device_config.json"
 fi
 
 # Set permissions
@@ -332,7 +368,15 @@ chmod +x /usr/local/bin/otp-secure
 cat > /usr/local/bin/otp-kiosk << 'BIN_EOF'
 #!/bin/bash
 cd /opt/otp-secure
-python3 kiosk_launcher_standalone.py "$@"
+# Try v2 kiosk launcher first, fall back to v1
+if [ -f "kiosk_launcher_standalone_v2.py" ]; then
+    python3 kiosk_launcher_standalone_v2.py "$@"
+elif [ -f "kiosk_launcher_standalone.py" ]; then
+    python3 kiosk_launcher_standalone.py "$@"
+else
+    echo "Error: No kiosk launcher found"
+    exit 1
+fi
 BIN_EOF
 chmod +x /usr/local/bin/otp-kiosk
 
@@ -367,8 +411,22 @@ if [ "$SETUP_KIOSK" = true ]; then
         fi
     done
     
+    # Copy legacy cipher file if exists
     if [ -f "$INSTALL_DIR/otp_cipher.txt" ]; then
         cp "$INSTALL_DIR/otp_cipher.txt" "$KIOSK_APP_DIR/"
+    fi
+    
+    # Copy per-contact pad data if exists
+    if [ -d "$INSTALL_DIR/otp_data" ]; then
+        cp -r "$INSTALL_DIR/otp_data" "$KIOSK_APP_DIR/"
+    fi
+    
+    # Copy contacts and config if exist
+    if [ -f "$INSTALL_DIR/contacts.json" ]; then
+        cp "$INSTALL_DIR/contacts.json" "$KIOSK_APP_DIR/"
+    fi
+    if [ -f "$INSTALL_DIR/device_config.json" ]; then
+        cp "$INSTALL_DIR/device_config.json" "$KIOSK_APP_DIR/"
     fi
     
     chown -R "$KIOSK_USER:$KIOSK_USER" "$KIOSK_APP_DIR"
@@ -387,9 +445,13 @@ xset s noblank
 # Hide mouse cursor when idle
 unclutter -idle 3 &
 
-# Start the kiosk launcher
+# Start the kiosk launcher (v2 with OTP Manager support)
 cd $KIOSK_APP_DIR
-python3 $KIOSK_APP_DIR/kiosk_launcher_standalone.py &
+if [ -f "$KIOSK_APP_DIR/kiosk_launcher_standalone_v2.py" ]; then
+    python3 $KIOSK_APP_DIR/kiosk_launcher_standalone_v2.py &
+else
+    python3 $KIOSK_APP_DIR/kiosk_launcher_standalone.py &
+fi
 AUTOSTART_EOF
     
     chown -R "$KIOSK_USER:$KIOSK_USER" "/home/$KIOSK_USER/.config"
@@ -494,9 +556,14 @@ if [ "$SETUP_KIOSK" = true ]; then
     fi
 else
     echo -e "  ${BOLD}Next Steps:${NC}"
-    echo "    1. Copy your OTP cipher file to $INSTALL_DIR/otp_cipher.txt"
-    echo "    2. Run 'otp-secure' to set up your device ID"
-    echo "    3. Add contacts and start communicating!"
+    echo "    1. Run 'otp-secure' to set up your device ID and add contacts"
+    echo "    2. Use OTP Manager to generate cipher pads for each contact"
+    echo "    3. Meet contacts in person to exchange pads via Bluetooth"
+    echo "    4. Start communicating securely!"
+    echo ""
+    echo -e "  ${BOLD}Per-Contact Pads:${NC}"
+    echo "    Each contact has their own unique cipher pad."
+    echo "    Pads are stored in: $INSTALL_DIR/otp_data/contacts/"
     echo ""
     echo "  For kiosk mode, run: sudo ./setup_otp_system.sh --kiosk"
 fi
